@@ -17,30 +17,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  // BYPASS LOGIN: Yeh ab kisi bhi credentials ko accept kar lega
+  // UNIVERSAL BYPASS LOGIN
   const login = async (email: string, password: string, role: UserRole): Promise<void> => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Dummy user data jo har login par set ho jayega
+      // Kisi bhi check ke baghair dummy user create karein
       const dummyUser: User = {
-        id: 'user123',
-        name: 'Sadia Admin',
+        id: 'user-' + Math.random().toString(36).substr(2, 9),
+        name: 'Sadia User',
         email: email,
         role: role,
         avatarUrl: `https://ui-avatars.com/api/?name=Sadia&background=random`,
-        bio: 'Project Administrator',
+        bio: 'Nexus Member',
         isOnline: true,
         createdAt: new Date().toISOString()
       };
 
       setUser(dummyUser);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(dummyUser));
-      toast.success('Bypass Login Successful!');
+      toast.success('Access Granted!');
     } catch (error) {
-      toast.error('Login failed');
-      throw error;
+      toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success('Logged out');
   };
 
-  // Khali functions taake errors na aayein
+  // Remaining functions to prevent TypeScript errors
   const register = async () => {};
   const forgotPassword = async () => {};
   const resetPassword = async () => {};
