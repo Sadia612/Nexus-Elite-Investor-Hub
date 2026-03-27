@@ -9,7 +9,7 @@ import { InvestorCard } from '../../components/investor/InvestorCard';
 import { investors } from '../../data/users';
 
 export const EntrepreneurDashboard: React.FC = () => {
-  // DATA FORCE FEED: Localhost jaisa Michael Rodriguez card show karne ke liye
+  // Fix: Data state mein direct daal diya taake Vercel par blank na aaye
   const [collaborationRequests, setCollaborationRequests] = useState<any[]>([
     {
       id: 'req-1',
@@ -27,6 +27,8 @@ export const EntrepreneurDashboard: React.FC = () => {
     );
   };
 
+  const pendingRequests = collaborationRequests.filter(req => req.status === 'pending');
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -39,12 +41,12 @@ export const EntrepreneurDashboard: React.FC = () => {
         </Link>
       </div>
 
-      {/* Summary cards - Exact Localhost Look */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-primary-50 border border-primary-100">
           <CardBody className="flex items-center">
             <div className="p-3 bg-primary-100 rounded-full mr-4"><Bell size={20} className="text-primary-700" /></div>
-            <div><p className="text-sm font-medium text-primary-700">Pending Requests</p><h3 className="text-xl font-semibold text-primary-900">1</h3></div>
+            <div><p className="text-sm font-medium text-primary-700">Pending Requests</p><h3 className="text-xl font-semibold text-primary-900">{pendingRequests.length}</h3></div>
           </CardBody>
         </Card>
         <Card className="bg-secondary-50 border border-secondary-100">
@@ -72,10 +74,9 @@ export const EntrepreneurDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Collaboration Requests</h2>
-              <Badge variant="primary">1 pending</Badge>
+              <Badge variant="primary">{pendingRequests.length} pending</Badge>
             </CardHeader>
             <CardBody className="space-y-4">
-              {/* Force rendering the card without checks */}
               {collaborationRequests.map(request => (
                 <CollaborationRequestCard
                   key={request.id}
