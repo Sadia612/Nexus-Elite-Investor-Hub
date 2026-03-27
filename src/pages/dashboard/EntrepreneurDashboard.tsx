@@ -19,11 +19,11 @@ export const EntrepreneurDashboard: React.FC = () => {
   const [recommendedInvestors] = useState(investors.slice(0, 3));
   
   useEffect(() => {
-    // Vercel fallback: Agar user load nahi hua to 'user-1' use karo
+    // Vercel fallback: Agar user load nahi hua to 'user-1' (Sarah) assume karo
     const userId = user?.id || 'user-1'; 
     let requests = getRequestsForEntrepreneur(userId);
     
-    // ROOT CAUSE FIX: Agar array khali hai to manual data force render karo
+    // FIX: Agar array khali hai (jo Vercel pe ho raha hai), to manual data dalo
     if (!requests || requests.length === 0) {
       requests = [{
         id: 'req-1',
@@ -32,7 +32,7 @@ export const EntrepreneurDashboard: React.FC = () => {
         message: "I'd like to explore potential investment in TechWave AI. Your AI-driven financial analytics platform aligns well with my investment thesis.",
         status: 'pending',
         createdAt: new Date().toISOString(),
-        investor: investors[0] // Michael Rodriguez
+        investor: investors[0] // Michael Rodriguez ka data
       }] as any;
     }
     setCollaborationRequests(requests);
@@ -46,12 +46,12 @@ export const EntrepreneurDashboard: React.FC = () => {
     );
   };
   
-  // Safe user display for Vercel blank screen fix
+  // Safe user display
   const displayUser = user || { name: 'Sarah Johnson' };
   
+  // FIXED logic: No more "|| 1" fake numbers
   const pendingRequests = collaborationRequests.filter(req => req.status === 'pending');
-  // Meetings count fix
-  const confirmedMeetingsCount = meetings?.filter((m: any) => m.status === 'confirmed').length || 1;
+  const confirmedMeetingsCount = meetings?.filter((m: any) => m.status === 'confirmed').length || 0;
   
   return (
     <div className="space-y-6 animate-fade-in">
@@ -62,66 +62,47 @@ export const EntrepreneurDashboard: React.FC = () => {
         </div>
         
         <Link to="/investors">
-          <Button leftIcon={<PlusCircle size={18} />}>
-            Find Investors
-          </Button>
+          <Button leftIcon={<PlusCircle size={18} />}>Find Investors</Button>
         </Link>
       </div>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-primary-50 border border-primary-100">
-          <CardBody>
-            <div className="flex items-center">
-              <div className="p-3 bg-primary-100 rounded-full mr-4">
-                <Bell size={20} className="text-primary-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-primary-700">Pending Requests</p>
-                <h3 className="text-xl font-semibold text-primary-900">{pendingRequests.length || 1}</h3>
-              </div>
+          <CardBody className="flex items-center">
+            <div className="p-3 bg-primary-100 rounded-full mr-4"><Bell size={20} className="text-primary-700" /></div>
+            <div>
+              <p className="text-sm font-medium text-primary-700">Pending Requests</p>
+              <h3 className="text-xl font-semibold text-primary-900">{pendingRequests.length}</h3>
             </div>
           </CardBody>
         </Card>
 
         <Card className="bg-secondary-50 border border-secondary-100">
-          <CardBody>
-            <div className="flex items-center">
-              <div className="p-3 bg-secondary-100 rounded-full mr-4">
-                <Users size={20} className="text-secondary-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-secondary-700">Total Connections</p>
-                <h3 className="text-xl font-semibold text-secondary-900">1</h3>
-              </div>
+          <CardBody className="flex items-center">
+            <div className="p-3 bg-secondary-100 rounded-full mr-4"><Users size={20} className="text-secondary-700" /></div>
+            <div>
+              <p className="text-sm font-medium text-secondary-700">Total Connections</p>
+              <h3 className="text-xl font-semibold text-secondary-900">1</h3>
             </div>
           </CardBody>
         </Card>
         
         <Card className="bg-accent-50 border border-accent-100">
-          <CardBody>
-            <div className="flex items-center">
-              <div className="p-3 bg-accent-100 rounded-full mr-4">
-                <Calendar size={20} className="text-accent-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-accent-700">Upcoming Meetings</p>
-                <h3 className="text-xl font-semibold text-accent-900">{confirmedMeetingsCount}</h3>
-              </div>
+          <CardBody className="flex items-center">
+            <div className="p-3 bg-accent-100 rounded-full mr-4"><Calendar size={20} className="text-accent-700" /></div>
+            <div>
+              <p className="text-sm font-medium text-accent-700">Upcoming Meetings</p>
+              <h3 className="text-xl font-semibold text-accent-900">{confirmedMeetingsCount}</h3>
             </div>
           </CardBody>
         </Card>
         
         <Card className="bg-success-50 border border-success-100">
-          <CardBody>
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full mr-4">
-                <TrendingUp size={20} className="text-success-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-success-700">Profile Views</p>
-                <h3 className="text-xl font-semibold text-success-900">24</h3>
-              </div>
+          <CardBody className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-full mr-4"><TrendingUp size={20} className="text-success-700" /></div>
+            <div>
+              <p className="text-sm font-medium text-success-700">Profile Views</p>
+              <h3 className="text-xl font-semibold text-success-900">24</h3>
             </div>
           </CardBody>
         </Card>
@@ -132,9 +113,8 @@ export const EntrepreneurDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Collaboration Requests</h2>
-              <Badge variant="primary">{pendingRequests.length || 1} pending</Badge>
+              <Badge variant="primary">{pendingRequests.length} pending</Badge>
             </CardHeader>
-            
             <CardBody>
               {collaborationRequests.length > 0 ? (
                 <div className="space-y-4">
@@ -148,9 +128,7 @@ export const EntrepreneurDashboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                    <AlertCircle size={24} className="text-gray-500" />
-                  </div>
+                  <AlertCircle size={24} className="text-gray-500 mx-auto mb-2" />
                   <p className="text-gray-600">No collaboration requests yet</p>
                 </div>
               )}
@@ -162,18 +140,11 @@ export const EntrepreneurDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Recommended Investors</h2>
-              <Link to="/investors" className="text-sm font-medium text-primary-600 hover:text-primary-500">
-                View all
-              </Link>
+              <Link to="/investors" className="text-sm font-medium text-primary-600">View all</Link>
             </CardHeader>
-            
             <CardBody className="space-y-4">
               {recommendedInvestors.map(investor => (
-                <InvestorCard
-                  key={investor.id}
-                  investor={investor}
-                  showActions={false}
-                />
+                <InvestorCard key={investor.id} investor={investor} showActions={false} />
               ))}
             </CardBody>
           </Card>
