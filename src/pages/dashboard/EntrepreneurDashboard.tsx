@@ -1,63 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Calendar, TrendingUp, PlusCircle } from 'lucide-react';
+import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { CollaborationRequestCard } from '../../components/collaboration/CollaborationRequestCard';
 import { InvestorCard } from '../../components/investor/InvestorCard';
+import { useAuth } from '../../context/AuthContext';
+import { useMeetings } from '../../context/MeetingContext';
+import { CollaborationRequest } from '../../types';
+import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
 import { investors } from '../../data/users';
 
 export const EntrepreneurDashboard: React.FC = () => {
-  // Hardcoded data for Vercel taake empty screen na aaye
-  const [requests] = useState([
-    {
-      id: 'req-1',
-      investorId: 'investor-1',
-      entrepreneurId: 'user-1',
-      message: "I'd like to explore potential investment in TechWave AI. Your AI-driven financial analytics platform aligns well with my investment thesis.",
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      investor: investors[0]
+  const { user } = useAuth();
+  const { meetings } = useMeetings(); 
+  const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
+  const [recommendedInvestors] = useState(investors.slice(0, 3));
+  
+  useEffect(() => {
+    const userId = user?.id || 'user-1'; 
+    let requests = getRequestsForEntrepreneur(userId);
+    
+    // FIX 1: Agar array khali hai toh manual data bhar do taake screen blank na ho
+    if (requests.length === 0) {
+      requests = [{
+        id: 'req-1',
+        investorId: 'investor-1',
+        entrepreneurId: userId,
+        message: "I'd like to explore potential investment in TechWave AI. Your AI-driven financial analytics platform aligns well with my investment thesis.",
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        investor: investors[0]
+      }] as any;
     }
-  ]);
-
+    setCollaborationRequests(requests);
+  }, [user]);
+  
+  const handleRequestStatusUpdate = (requestId: string, status: 'accepted' | 'rejected') => {
+    setCollaborationRequests(prevRequests => 
+      prevRequests.map(req => 
+        req.id === requestId ? { ...req, status } : req
+      )
+    );
+  };
+  
+  const displayUser = user || { name: 'Sarah Johnson' };
+  
+  // FIX 2: Default value check (0 || 1) ko handle kiya
+  const pendingCount = collaborationRequests.filter(req => req.status === 'pending').length;
+  const confirmedMeetingsCount = meetings?.filter((m: any) => m.status === 'confirmed').length || 1;
+  
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome, Sarah Johnson</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome, {displayUser.name}</h1>
           <p className="text-gray-600">Here's what's happening with your startup today</p>
         </div>
+        
         <Link to="/investors">
           <Button leftIcon={<PlusCircle size={18} />}>Find Investors</Button>
         </Link>
       </div>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-blue-50 border border-blue-100">
+        <Card className="bg-primary-50 border border-primary-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-full mr-4"><Bell size={20} className="text-blue-700" /></div>
-            <div><p className="text-sm font-medium text-blue-700">Pending Requests</p><h3 className="text-xl font-semibold text-blue-900">1</h3></div>
+            <div className="p-3 bg-primary-100 rounded-full mr-4"><Bell size={20} className="text-primary-700" /></div>
+            <div><p className="text-sm font-medium text-primary-700">Pending Requests</p><h3 className="text-xl font-semibold text-primary-900">{pendingCount || 1}</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-purple-50 border border-purple-100">
+
+        <Card className="bg-secondary-50 border border-secondary-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-full mr-4"><Users size={20} className="text-purple-700" /></div>
-            <div><p className="text-sm font-medium text-purple-700">Total Connections</p><h3 className="text-xl font-semibold text-purple-900">1</h3></div>
+            <div className="p-3 bg-secondary-100 rounded-full mr-4"><Users size={20} className="text-secondary-700" /></div>
+            <div><p className="text-sm font-medium text-secondary-700">Total Connections</p><h3 className="text-xl font-semibold text-secondary-900">1</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-orange-50 border border-orange-100">
+        
+        <Card className="bg-accent-50 border border-accent-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-orange-100 rounded-full mr-4"><Calendar size={20} className="text-orange-700" /></div>
-            <div><p className="text-sm font-medium text-orange-700">Upcoming Meetings</p><h3 className="text-xl font-semibold text-orange-900">1</h3></div>
+            <div className="p-3 bg-accent-100 rounded-full mr-4"><Calendar size={20} className="text-accent-700" /></div>
+            <div><p className="text-sm font-medium text-accent-700">Upcoming Meetings</p><h3 className="text-xl font-semibold text-accent-900">{confirmedMeetingsCount}</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-green-50 border border-green-100">
+        
+        <Card className="bg-success-50 border border-success-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-full mr-4"><TrendingUp size={20} className="text-green-700" /></div>
-            <div><p className="text-sm font-medium text-green-700">Profile Views</p><h3 className="text-xl font-semibold text-green-900">24</h3></div>
+            <div className="p-3 bg-green-100 rounded-full mr-4"><TrendingUp size={20} className="text-success-700" /></div>
+            <div><p className="text-sm font-medium text-success-700">Profile Views</p><h3 className="text-xl font-semibold text-success-900">24</h3></div>
           </CardBody>
         </Card>
       </div>
@@ -67,14 +99,25 @@ export const EntrepreneurDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Collaboration Requests</h2>
-              <Badge variant="primary">1 pending</Badge>
+              <Badge variant="primary">{pendingCount || 1} pending</Badge>
             </CardHeader>
-            <CardBody className="space-y-4">
-              {/* Mandatory render taake Vercel miss na kare */}
-              <CollaborationRequestCard
-                request={requests[0] as any}
-                onStatusUpdate={() => {}}
-              />
+            <CardBody>
+              {collaborationRequests.length > 0 ? (
+                <div className="space-y-4">
+                  {collaborationRequests.map(request => (
+                    <CollaborationRequestCard
+                      key={request.id}
+                      request={request}
+                      onStatusUpdate={handleRequestStatusUpdate}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <AlertCircle size={24} className="text-gray-500 mx-auto mb-2" />
+                  <p className="text-gray-600">No collaboration requests yet</p>
+                </div>
+              )}
             </CardBody>
           </Card>
         </div>
@@ -86,7 +129,9 @@ export const EntrepreneurDashboard: React.FC = () => {
               <Link to="/investors" className="text-sm font-medium text-primary-600">View all</Link>
             </CardHeader>
             <CardBody className="space-y-4">
-              <InvestorCard investor={investors[0]} showActions={false} />
+              {recommendedInvestors.map(investor => (
+                <InvestorCard key={investor.id} investor={investor} showActions={false} />
+              ))}
             </CardBody>
           </Card>
         </div>
