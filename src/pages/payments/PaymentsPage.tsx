@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardBody } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { 
   ArrowUpRight, ArrowDownLeft, Send, History, 
-  CheckCircle2, Clock, Wallet, X, AlertCircle, CircleDollarSign, Zap
+  CheckCircle2, Wallet, X, AlertCircle, CircleDollarSign, Zap
 } from 'lucide-react';
 
 export const PaymentsPage: React.FC = () => {
@@ -29,20 +29,13 @@ export const PaymentsPage: React.FC = () => {
       "2. 'B2B Deal' allows direct investor-to-startup funding.",
       "3. Check the 'Audit Trail' for live transaction logs."
     ];
-
-    <Button 
-  onClick={startGuidedTour} 
-  className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all animate-bounce"
->
-  🚀 Start Milestone 7 Tour
-</Button>
     
     let currentStep = 0;
     const showNextStep = () => {
       if (currentStep < steps.length) {
         alert(steps[currentStep]);
         currentStep++;
-        setTimeout(showNextStep, 500); // 0.5s gap between hints
+        setTimeout(showNextStep, 800);
       }
     };
     showNextStep();
@@ -110,13 +103,13 @@ export const PaymentsPage: React.FC = () => {
           <h1 className="text-4xl font-[900] text-slate-900 tracking-tight">Finance Hub</h1>
           <p className="text-slate-500 font-medium mt-1">Real-time capital management & deal flows</p>
           
-          {/* Milestone 7: Tour Button */}
-          <button 
-            onClick={startGuidedTour}
-            className="mt-4 flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all"
+          {/* Milestone 7 Button - Correctly Placed */}
+          <Button 
+            onClick={startGuidedTour} 
+            className="mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all animate-bounce flex items-center gap-2"
           >
-            <Zap size={14} /> Start Guided Tour
-          </button>
+            🚀 Start Milestone 7 Tour
+          </Button>
         </div>
         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 min-w-[240px]">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Available Liquidity</p>
