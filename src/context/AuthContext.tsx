@@ -3,75 +3,56 @@ import { User, UserRole, AuthContextType } from '../types';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const USER_STORAGE_KEY = 'business_nexus_user';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('business_nexus_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
-  }, []);
-
-  // UNIVERSAL BYPASS LOGIN
   const login = async (email: string, password: string, role: UserRole): Promise<void> => {
     setIsLoading(true);
-    try {
-      // Kisi bhi check ke baghair dummy user create karein
-      const dummyUser: User = {
-        id: 'user-' + Math.random().toString(36).substr(2, 9),
-        name: 'Sadia User',
-        email: email,
-        role: role,
-        avatarUrl: `https://ui-avatars.com/api/?name=Sadia&background=random`,
-        bio: 'Nexus Member',
-        isOnline: true,
-        createdAt: new Date().toISOString()
-      };
-
-      setUser(dummyUser);
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(dummyUser));
-      toast.success('Access Granted!');
-    } catch (error) {
-      toast.error('Something went wrong');
-    } finally {
-      setIsLoading(false);
-    }
+    // Instant Login Bypass
+    const dummyUser: User = {
+      id: 'admin-123',
+      name: 'Sadia Admin',
+      email: email,
+      role: role,
+      avatarUrl: `https://ui-avatars.com/api/?name=Sadia&background=random`,
+      bio: 'Project Administrator', // Yahan bio add kar di hai error fix karne ke liye
+      isOnline: true,
+      createdAt: new Date().toISOString()
+    };
+    
+    setUser(dummyUser);
+    localStorage.setItem('business_nexus_user', JSON.stringify(dummyUser));
+    toast.success('System Bypassed - Welcome!');
+    setIsLoading(false);
   };
 
-  const logout = (): void => {
+  const logout = () => {
     setUser(null);
-    localStorage.removeItem(USER_STORAGE_KEY);
-    toast.success('Logged out');
+    localStorage.removeItem('business_nexus_user');
   };
-
-  // Remaining functions to prevent TypeScript errors
-  const register = async () => {};
-  const forgotPassword = async () => {};
-  const resetPassword = async () => {};
-  const updateProfile = async () => {};
 
   const value = {
     user,
     login,
-    register,
     logout,
-    forgotPassword,
-    resetPassword,
-    updateProfile,
     isAuthenticated: !!user,
-    isLoading
-  };
+    isLoading,
+    register: async () => {},
+    forgotPassword: async () => {},
+    resetPassword: async () => {},
+    updateProfile: async () => {}
+  } as AuthContextType;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
+  if (context === undefined) throw new Error('useAuth error');
   return context;
 };
