@@ -9,15 +9,15 @@ import { InvestorCard } from '../../components/investor/InvestorCard';
 import { investors } from '../../data/users';
 
 export const EntrepreneurDashboard: React.FC = () => {
-  // Direct data entry taake Vercel filter na kar sakay
   const [collaborationRequests] = useState([
     {
       id: 'req-1',
       investorId: 'investor-1',
+      entrepreneurId: 'user-1', // Ye line add ki hai error khatam karne ke liye
       message: "I'd like to explore potential investment in TechWave AI. Your AI-driven financial analytics platform aligns well with my investment thesis.",
-      status: 'pending',
+      status: 'pending' as const,
       createdAt: new Date().toISOString(),
-      investor: investors[0] // Michael Rodriguez
+      investor: investors[0]
     }
   ]);
 
@@ -68,9 +68,8 @@ export const EntrepreneurDashboard: React.FC = () => {
               <Badge variant="primary">1 pending</Badge>
             </CardHeader>
             <CardBody className="space-y-4">
-              {/* No more empty checks, just render the card */}
               <CollaborationRequestCard
-                request={collaborationRequests[0]}
+                request={collaborationRequests[0] as any}
                 onStatusUpdate={() => {}}
               />
             </CardBody>
