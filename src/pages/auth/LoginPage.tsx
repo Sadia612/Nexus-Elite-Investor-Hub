@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, CircleDollarSign, Building2, ShieldCheck, 
   Smartphone, Eye, EyeOff, ChevronRight, AlertCircle 
@@ -60,6 +60,10 @@ export const LoginPage: React.FC = () => {
 
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill all fields");
+      return;
+    }
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -67,20 +71,33 @@ export const LoginPage: React.FC = () => {
     }, 800);
   };
 
+  // FIXED VERIFICATION LOGIC
   const handleFinalVerify = async () => {
     setIsLoading(true);
+    setError(null);
+
+    // 1. Check if OTP is '0000'
+    const enteredCode = otp.join('');
+    if (enteredCode !== '0000') {
+      setError("Invalid code. Please use '0000' for testing.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      // 2. Call the context login
       await login(email, password, role);
-      navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+      // 3. Navigate based on role
+      const targetPath = role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor';
+      navigate(targetPath);
     } catch (err) {
-      setError("Invalid code. Please try again.");
+      setError("Login failed. Check your credentials.");
       setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 selection:bg-blue-100">
-      {/* Subtle Slide-up Animation */}
       <div className="w-full max-w-[440px] animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
         
         {/* Logo Section */}
@@ -105,7 +122,6 @@ export const LoginPage: React.FC = () => {
 
           {step === 1 ? (
             <form className="space-y-7" onSubmit={handleInitialSubmit}>
-              {/* Role Switcher */}
               <div className="flex p-1.5 bg-slate-100/50 rounded-2xl border border-slate-100">
                 <button
                   type="button"
@@ -123,7 +139,6 @@ export const LoginPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Email & Password Input */}
               <div className="space-y-5">
                 <div className="relative group">
                   <input 
@@ -133,7 +148,7 @@ export const LoginPage: React.FC = () => {
                     placeholder="Corporate Email"
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-5 font-bold outline-none focus:border-blue-500 focus:bg-white transition-all"
                   />
-                  <User size={18} className="absolute right-5 top-4 text-slate-300 group-focus-within:text-blue-500" />
+                  <User size={18} className="absolute right-5 top-4 text-slate-300" />
                 </div>
 
                 <div className="relative group">
@@ -147,36 +162,24 @@ export const LoginPage: React.FC = () => {
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-4 text-slate-300">
                     {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
                   </button>
-                  
-                  {/* Strength Bar */}
-                  {password.length > 0 && (
-                    <div className="mt-4 px-1">
-                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                        <div className={`h-full ${strength.color} transition-all duration-700`} style={{ width: strength.w }} />
-                      </div>
-                      <span className="text-[9px] font-black text-slate-400 mt-1 block tracking-widest uppercase">Security: {strength.label}</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              <button type="submit" className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black shadow-xl shadow-blue-100 flex items-center justify-center gap-2 group transition-all active:scale-[0.98]">
+              <button type="submit" className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black shadow-xl shadow-blue-100 flex items-center justify-center gap-2 transition-all">
                 {isLoading ? 'Processing...' : 'Proceed to Verify'}
-                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <ChevronRight size={20} />
               </button>
             </form>
           ) : (
-            /* 2FA STEP */
             <div className="space-y-10 animate-in slide-in-from-right duration-500">
               <div className="text-center">
                 <div className="w-20 h-20 bg-blue-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-blue-600">
                   <Smartphone size={36} />
                 </div>
                 <h3 className="text-2xl font-black text-slate-900">Enter Code</h3>
-                <p className="text-slate-500 text-sm mt-2">Check your device for the 4-digit security code.</p>
+                <p className="text-slate-500 text-sm mt-2">Use '0000' to access the hub.</p>
               </div>
 
-              {/* OTP Inputs with Auto-focus */}
               <div className="flex gap-4 justify-center">
                 {otp.map((digit, i) => (
                   <input
@@ -193,7 +196,7 @@ export const LoginPage: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <button onClick={handleFinalVerify} className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black shadow-xl shadow-blue-200 transition-all active:scale-[0.98]">
+                <button onClick={handleFinalVerify} className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black shadow-xl shadow-blue-200 transition-all">
                   Verify & Access
                 </button>
                 <button onClick={() => setStep(1)} className="w-full text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors">
