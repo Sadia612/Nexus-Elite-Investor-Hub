@@ -9,13 +9,14 @@ import { InvestorCard } from '../../components/investor/InvestorCard';
 import { investors } from '../../data/users';
 
 export const EntrepreneurDashboard: React.FC = () => {
-  const [collaborationRequests] = useState([
+  // Hardcoded data for Vercel taake empty screen na aaye
+  const [requests] = useState([
     {
       id: 'req-1',
       investorId: 'investor-1',
-      entrepreneurId: 'user-1', // Ye line add ki hai error khatam karne ke liye
+      entrepreneurId: 'user-1',
       message: "I'd like to explore potential investment in TechWave AI. Your AI-driven financial analytics platform aligns well with my investment thesis.",
-      status: 'pending' as const,
+      status: 'pending',
       createdAt: new Date().toISOString(),
       investor: investors[0]
     }
@@ -33,29 +34,30 @@ export const EntrepreneurDashboard: React.FC = () => {
         </Link>
       </div>
 
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-primary-50 border border-primary-100">
+        <Card className="bg-blue-50 border border-blue-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-primary-100 rounded-full mr-4"><Bell size={20} className="text-primary-700" /></div>
-            <div><p className="text-sm font-medium text-primary-700">Pending Requests</p><h3 className="text-xl font-semibold text-primary-900">1</h3></div>
+            <div className="p-3 bg-blue-100 rounded-full mr-4"><Bell size={20} className="text-blue-700" /></div>
+            <div><p className="text-sm font-medium text-blue-700">Pending Requests</p><h3 className="text-xl font-semibold text-blue-900">1</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-secondary-50 border border-secondary-100">
+        <Card className="bg-purple-50 border border-purple-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-secondary-100 rounded-full mr-4"><Users size={20} className="text-secondary-700" /></div>
-            <div><p className="text-sm font-medium text-secondary-700">Total Connections</p><h3 className="text-xl font-semibold text-secondary-900">1</h3></div>
+            <div className="p-3 bg-purple-100 rounded-full mr-4"><Users size={20} className="text-purple-700" /></div>
+            <div><p className="text-sm font-medium text-purple-700">Total Connections</p><h3 className="text-xl font-semibold text-purple-900">1</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-accent-50 border border-accent-100">
+        <Card className="bg-orange-50 border border-orange-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-accent-100 rounded-full mr-4"><Calendar size={20} className="text-accent-700" /></div>
-            <div><p className="text-sm font-medium text-accent-700">Upcoming Meetings</p><h3 className="text-xl font-semibold text-accent-900">1</h3></div>
+            <div className="p-3 bg-orange-100 rounded-full mr-4"><Calendar size={20} className="text-orange-700" /></div>
+            <div><p className="text-sm font-medium text-orange-700">Upcoming Meetings</p><h3 className="text-xl font-semibold text-orange-900">1</h3></div>
           </CardBody>
         </Card>
-        <Card className="bg-success-50 border border-success-100">
+        <Card className="bg-green-50 border border-green-100">
           <CardBody className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-full mr-4"><TrendingUp size={20} className="text-success-700" /></div>
-            <div><p className="text-sm font-medium text-success-700">Profile Views</p><h3 className="text-xl font-semibold text-success-900">24</h3></div>
+            <div className="p-3 bg-green-100 rounded-full mr-4"><TrendingUp size={20} className="text-green-700" /></div>
+            <div><p className="text-sm font-medium text-green-700">Profile Views</p><h3 className="text-xl font-semibold text-green-900">24</h3></div>
           </CardBody>
         </Card>
       </div>
@@ -68,8 +70,9 @@ export const EntrepreneurDashboard: React.FC = () => {
               <Badge variant="primary">1 pending</Badge>
             </CardHeader>
             <CardBody className="space-y-4">
+              {/* Mandatory render taake Vercel miss na kare */}
               <CollaborationRequestCard
-                request={collaborationRequests[0] as any}
+                request={requests[0] as any}
                 onStatusUpdate={() => {}}
               />
             </CardBody>
